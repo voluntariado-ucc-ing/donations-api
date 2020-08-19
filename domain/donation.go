@@ -1,4 +1,10 @@
 package domain
+/* STATUS
+toBeConfirmed
+toBeRetrieved
+retrieved
+rejected
+*/
 
 type Donation struct {
 	DonationId  int64      `json:"donation_id"`
@@ -11,6 +17,7 @@ type Donation struct {
 	Date        string     `json:"donation_date"`
 	DirectionId int64      `json:"direction_id"`
 	Direction   *Direction `json:"direction,omitempty"`
+	Status      int        `json:"status"`
 }
 
 type DonationRequest struct {
