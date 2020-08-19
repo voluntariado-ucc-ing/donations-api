@@ -9,11 +9,11 @@ RUN go install -v ./...
 CMD ["donations-api"]
 
 # Database Credentials
-ENV DB_HOST=ec2-52-87-135-240.compute-1.amazonaws.com
+ENV DB_HOST=172.17.0.2:5432
 
-ENV DB_USER=rumxsiovwviqfx
+ENV DB_USER=postgres
 
-ENV DB_PASS=096f56199709e39cf83d39a209d46657d35047b97b8f8c173028830b5a9fe207
+ENV DB_PASS=ysl*gzzjic4Taok
 
 ENV DB_NAME=d9fuu92algrdm0
 
