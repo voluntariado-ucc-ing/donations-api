@@ -15,6 +15,6 @@ ENV DB_USER=postgres
 
 ENV DB_PASS=ysl*gzzjic4Taok
 
-ENV DB_NAME=d9fuu92algrdm0
+ENV DB_NAME=voluntariado_ing
 
 EXPOSE 8080
