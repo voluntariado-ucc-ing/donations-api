@@ -9,7 +9,7 @@ RUN go install -v ./...
 CMD ["donations-api"]
 
 # Database Credentials
-ENV DB_HOST=172.18.0.9
+ENV DB_HOST=178.18.0.9
 
 ENV DB_USER=postgres
 
