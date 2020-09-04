@@ -14,9 +14,11 @@ import (
 const (
 	queryInsertDirection = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
 	queryInsertDonation  = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
-	queryGetDonorById    = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
+	queryGetDonorByMail  = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
 	queryInsertDonor     = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
-)
+	queryGetDonationById = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
+	queryGetDonorById  = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
+	)
 
 var dbClient *sql.DB
 
@@ -69,9 +71,9 @@ func InsertDonation(don domain.Donation) (int64, domain.ApiError) {
 	return id, nil
 }
 
-func GetDonator(mail string) (*domain.Donor, domain.ApiError) {
+func GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError) {
 	var donor domain.Donor
-	q, err := dbClient.Prepare(queryGetDonorById)
+	q, err := dbClient.Prepare(queryGetDonorByMail)
 	if err != nil {
 		return nil, domain.NewInternalServerApiError("Error preparing get donator statement", err)
 	}
@@ -95,4 +97,37 @@ func InsertDonor(don domain.Donor) (int64, domain.ApiError) {
 		return 0, domain.NewInternalServerApiError("Error scaning last insert id for create donator", err)
 	}
 	return id, nil
+}
+
+func GetDonation(id int64) (*domain.Donation, domain.ApiError) {
+	var donation domain.Donation
+	q, err := dbClient.Prepare(queryGetDonationById)
+	if err != nil {
+		return nil, domain.NewInternalServerApiError("Error preparing get donation statement", err)
+	}
+	res := q.QueryRow(id)
+	donation.Direction = &domain.Direction{}
+	err = res.Scan(&donation.DonationId, &donation.Quantity, &donation.Unit,
+		&donation.Description, &donation.TypeId, &donation.Date, &donation.Status,
+		&donation.Element, &donation.DonorId, &donation.Direction.DirectionId, &donation.Direction.Street,
+		&donation.Direction.Number, &donation.Direction.Details, &donation.Direction.City, &donation.Direction.PostalCode)
+	if err != nil {
+		return nil, domain.NewNotFoundApiError("Error donation not found")
+	}
+
+	return &donation, nil
+}
+
+func GetDonatorById(id int64) (*domain.Donor, domain.ApiError) {
+	var donor domain.Donor
+	q, err := dbClient.Prepare(queryGetDonorById)
+	if err != nil {
+		return nil, domain.NewInternalServerApiError("Error preparing get donator statement", err)
+	}
+	res := q.QueryRow(id)
+	err = res.Scan(&donor.DonorId, &donor.Mail, &donor.FirstName, &donor.LastName, &donor.PhoneNumber)
+	if err != nil {
+		return nil, domain.NewApiError("Error donator not found", err.Error(), http.StatusNotFound, domain.CauseList{})
+	}
+	return &donor, nil
 }

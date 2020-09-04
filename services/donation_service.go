@@ -13,13 +13,19 @@ var (
 type donationServiceInterface interface {
 	CreateDonation(request domain.DonationRequest) (*domain.DonationRequest, domain.ApiError)
 	GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError)
+	GetDonation(id int64) (*domain.Donation, domain.ApiError)
+	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
 }
 
 type donationService struct {}
 
+func (d donationService) GetDonation(id int64) (*domain.Donation, domain.ApiError) {
+	return clients.GetDonation(id)
+}
+
 func (d donationService) CreateDonation(request domain.DonationRequest) (*domain.DonationRequest, domain.ApiError) {
 	var donorId int64 = 0
-	donor, err := clients.GetDonator(request.Donor.Mail)
+	donor, err := clients.GetDonatorByMail(request.Donor.Mail)
 	if err != nil {
 		if err.Status() != http.StatusNotFound {
 			return nil, err
@@ -54,7 +60,15 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 }
 
 func (d donationService) GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError) {
-	donor, err := clients.GetDonator(mail)
+	donor, err := clients.GetDonatorByMail(mail)
+	if err != nil {
+		return nil, err
+	}
+	return donor, nil
+}
+
+func (d donationService) GetDonatorById(id int64) (*domain.Donor, domain.ApiError) {
+	donor, err := clients.GetDonatorById(id)
 	if err != nil {
 		return nil, err
 	}

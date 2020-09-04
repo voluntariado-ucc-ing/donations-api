@@ -6,6 +6,7 @@ import (
 	"github.com/voluntariado-ucc-ing/donations-api/domain"
 	"github.com/voluntariado-ucc-ing/donations-api/services"
 	"net/http"
+	"strconv"
 )
 
 var(
@@ -15,7 +16,7 @@ var(
 type donationsControllerInterface interface {
 	CreateDonation(c *gin.Context)
 	GetDonation(c *gin.Context)
-	GetDonatorByMail(c *gin.Context)
+	GetDonator(c *gin.Context)
 	GetAllDonations(c *gin.Context)
 	EditDonation(c *gin.Context)
 	DeleteDonation(c *gin.Context)
@@ -23,19 +24,39 @@ type donationsControllerInterface interface {
 
 type donationController struct {}
 
-func (d donationController) GetDonatorByMail(c *gin.Context) {
+func (d donationController) GetDonator(c *gin.Context) {
 	mail := c.Query("mail")
-	if mail == "" {
-		err := domain.NewBadRequestApiError("must pass mail param")
+	id := c.Query("id")
+	if mail == "" && id == ""{
+		err := domain.NewBadRequestApiError("must pass mail or id param")
 		c.JSON(err.Status(), err)
 		return
 	}
 
-	data, err := services.DonationService.GetDonatorByMail(mail)
-	if err != nil {
-		c.JSON(err.Status(), err)
-		return
+	var data *domain.Donor
+	var err domain.ApiError
+	if mail != "" {
+		data, err = services.DonationService.GetDonatorByMail(mail)
+		if err != nil {
+			c.JSON(err.Status(), err)
+			return
+		}
+	} else if id != "" {
+		donorId, parseErr := strconv.ParseInt(id, 10, 64)
+		if parseErr != nil {
+			fmt.Println(parseErr)
+			badRequest := domain.NewBadRequestApiError("donator id must be a number " + parseErr.Error())
+			c.JSON(badRequest.Status(), badRequest)
+			return
+		}
+
+		data, err = services.DonationService.GetDonatorById(donorId)
+		if err != nil {
+			c.JSON(err.Status(), err)
+			return
+		}
 	}
+
 
 	c.JSON(http.StatusOK, data)
 }
@@ -61,7 +82,30 @@ func (d donationController) CreateDonation(c *gin.Context) {
 }
 
 func (d donationController) GetDonation(c *gin.Context) {
-	panic("implement me")
+	donationId := c.Param("id")
+	if donationId == "" {
+		err := domain.NewBadRequestApiError("donation id must not be empty")
+		fmt.Println(err)
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	id, err := strconv.ParseInt(donationId, 10, 64)
+	if err != nil {
+		fmt.Println(err)
+		badRequest := domain.NewBadRequestApiError("donation id must be a number " + err.Error())
+		c.JSON(badRequest.Status(), badRequest)
+		return
+	}
+
+	donation, dErr := services.DonationService.GetDonation(id)
+	if dErr != nil {
+		fmt.Println(dErr)
+		c.JSON(dErr.Status(), dErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, donation)
 }
 
 func (d donationController) GetAllDonations(c *gin.Context) {
