@@ -112,6 +112,7 @@ func GetDonation(id int64) (*domain.Donation, domain.ApiError) {
 		&donation.Element, &donation.DonorId, &donation.Direction.DirectionId, &donation.Direction.Street,
 		&donation.Direction.Number, &donation.Direction.Details, &donation.Direction.City, &donation.Direction.PostalCode)
 	if err != nil {
+		fmt.Print(err)
 		return nil, domain.NewNotFoundApiError("Error donation not found")
 	}
 
