@@ -12,10 +12,10 @@ import (
 )
 
 const (
-	queryInsertDirection = "INSERT INTO voluntariado_ing.directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
-	queryInsertDonation  = "INSERT INTO voluntariado_ing.donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
-	queryGetDonorById    = "SELECT donator_id, mail, first_name, last_name, phone_number FROM voluntariado_ing.donators WHERE mail=$1"
-	queryInsertDonor     = "INSERT INTO voluntariado_ing.donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
+	queryInsertDirection = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
+	queryInsertDonation  = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
+	queryGetDonorById    = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
+	queryInsertDonor     = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
 )
 
 var dbClient *sql.DB
