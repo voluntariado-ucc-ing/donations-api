@@ -1,4 +1,5 @@
 package domain
+
 /* STATUS
 toBeConfirmed
 toBeRetrieved
@@ -17,7 +18,7 @@ type Donation struct {
 	Date        string     `json:"donation_date"`
 	DirectionId int64      `json:"direction_id"`
 	Direction   *Direction `json:"direction,omitempty"`
-	Status      int        `json:"status"`
+	Status      string     `json:"status"`
 }
 
 type DonationRequest struct {
