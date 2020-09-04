@@ -9,13 +9,6 @@ RUN go install -v ./...
 CMD ["donations-api"]
 
 # Database Credentials
-ENV DB_HOST=172.17.0.4
-
-ENV DB_USER=postgres
-
-ENV DB_PASS=ysl*gzzjic4Taok
-
-ENV DB_NAME=voluntariado_ing
 
 EXPOSE 8080
 
