@@ -18,3 +18,7 @@ ENV DB_PASS=ysl*gzzjic4Taok
 ENV DB_NAME=voluntariado_ing
 
 EXPOSE 8080
+
+# Commands for running in docker
+# docker build -t donations_api .
+# docker run donations_api

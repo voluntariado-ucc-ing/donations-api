@@ -22,9 +22,10 @@ var dbClient *sql.DB
 
 func init() {
 	var err error
-	connStr := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+	connStr := fmt.Sprintf("host=%s user=%s port=%s password=%s dbname=%s sslmode=disable",
 		config.GetDatabaseHost(),
 		config.GetDatabaseUser(),
+		config.GetDatabasePort(),
 		config.GetDatabasePassword(),
 		config.GetDatabaseName())
 

@@ -1,6 +1,5 @@
 package config
 
-
 import "os"
 
 const (
@@ -8,6 +7,7 @@ const (
 	dbPassword = "DB_PASS"
 	dbUser     = "DB_USER"
 	dbHost     = "DB_HOST"
+	dbPort     = "DB_PORT"
 )
 
 var (
@@ -15,6 +15,7 @@ var (
 	databaseUser     = os.Getenv(dbUser)
 	databasePassword = os.Getenv(dbPassword)
 	databaseHost     = os.Getenv(dbHost)
+	databasePort     = os.Getenv(dbPort)
 )
 
 func GetDatabaseHost() string {
@@ -33,3 +34,6 @@ func GetDatabasePassword() string {
 	return databasePassword
 }
 
+func GetDatabasePort() string {
+	return databasePort
+}
