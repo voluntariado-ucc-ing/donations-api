@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	queryGetAllDonations = "SELECT donation_id FROM donation"
+	queryGetAllDonations = "SELECT donation_id FROM donations"
 	queryInsertDirection = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
 	queryInsertDonation  = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
 	queryGetDonorByMail  = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
@@ -140,13 +140,13 @@ func GetAllDonationsIds() ([]int64, domain.ApiError) {
 	q, err := dbClient.Prepare(queryGetAllDonations)
 	if err != nil {
 		fmt.Println(err)
-		return nil, apierrors.NewInternalServerApiError("Error preparing get all volunteers statement", err)
+		return nil, domain.NewInternalServerApiError("Error preparing get all volunteers statement", err)
 	}
 
 	res, err := q.Query()
 	if err != nil {
 		fmt.Println(err)
-		return nil, apierrors.NewNotFoundApiError("no donations found")
+		return nil, domain.NewNotFoundApiError("no donations found")
 	}
 
 	defer res.Close()
@@ -155,7 +155,7 @@ func GetAllDonationsIds() ([]int64, domain.ApiError) {
 		var id int64
 		err := res.Scan(&id)
 		if err != nil {
-			return nil, apierrors.NewNotFoundApiError("id not found in get all")
+			return nil, domain.NewNotFoundApiError("id not found in get all")
 		}
 		ids = append(ids, id)
 	}
