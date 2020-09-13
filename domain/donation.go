@@ -26,6 +26,11 @@ type DonationRequest struct {
 	Donor     Donor      `json:"donator"`
 }
 
+type DonationConcurrent struct {
+	Donation *Donation
+	Error    ApiError
+}
+
 type Direction struct {
 	DirectionId int64  `json:"direction_id"`
 	Street      string `json:"street"`

@@ -8,4 +8,5 @@ func mapUrls() {
 	router.GET("/donations/get/:id", controllers.DonationController.GetDonation)
 	router.GET("/donations/donators", controllers.DonationController.GetDonator)
 	router.POST("/donations/create", controllers.DonationController.CreateDonation)
+	router.GET("/donations/all", controllers.DonationController.GetAllDonations)
 }

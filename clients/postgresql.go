@@ -3,22 +3,24 @@ package clients
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
-	"github.com/voluntariado-ucc-ing/donations-api/config"
-	"github.com/voluntariado-ucc-ing/donations-api/domain"
 	"log"
 	"net/http"
 	"time"
+
+	_ "github.com/lib/pq"
+	"github.com/voluntariado-ucc-ing/donations-api/config"
+	"github.com/voluntariado-ucc-ing/donations-api/domain"
 )
 
 const (
+	queryGetAllDonations = "SELECT donation_id FROM donation"
 	queryInsertDirection = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
 	queryInsertDonation  = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
 	queryGetDonorByMail  = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
 	queryInsertDonor     = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
 	queryGetDonationById = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
-	queryGetDonorById  = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
-	)
+	queryGetDonorById    = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
+)
 
 var dbClient *sql.DB
 
@@ -131,4 +133,32 @@ func GetDonatorById(id int64) (*domain.Donor, domain.ApiError) {
 		return nil, domain.NewApiError("Error donator not found", err.Error(), http.StatusNotFound, domain.CauseList{})
 	}
 	return &donor, nil
+}
+
+func GetAllDonationsIds() ([]int64, domain.ApiError) {
+	ids := make([]int64, 0)
+	q, err := dbClient.Prepare(queryGetAllDonations)
+	if err != nil {
+		fmt.Println(err)
+		return nil, apierrors.NewInternalServerApiError("Error preparing get all volunteers statement", err)
+	}
+
+	res, err := q.Query()
+	if err != nil {
+		fmt.Println(err)
+		return nil, apierrors.NewNotFoundApiError("no donations found")
+	}
+
+	defer res.Close()
+
+	for res.Next() {
+		var id int64
+		err := res.Scan(&id)
+		if err != nil {
+			return nil, apierrors.NewNotFoundApiError("id not found in get all")
+		}
+		ids = append(ids, id)
+	}
+
+	return ids, nil
 }

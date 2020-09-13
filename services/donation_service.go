@@ -1,9 +1,10 @@
 package services
 
 import (
+	"net/http"
+
 	"github.com/voluntariado-ucc-ing/donations-api/clients"
 	"github.com/voluntariado-ucc-ing/donations-api/domain"
-	"net/http"
 )
 
 var (
@@ -15,9 +16,10 @@ type donationServiceInterface interface {
 	GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError)
 	GetDonation(id int64) (*domain.Donation, domain.ApiError)
 	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
+	GetAllDonations() ([]domain.Donation, domain.ApiError)
 }
 
-type donationService struct {}
+type donationService struct{}
 
 func (d donationService) GetDonation(id int64) (*domain.Donation, domain.ApiError) {
 	return clients.GetDonation(id)
@@ -73,4 +75,35 @@ func (d donationService) GetDonatorById(id int64) (*domain.Donor, domain.ApiErro
 		return nil, err
 	}
 	return donor, nil
+}
+
+func (d donationService) GetAllDonations() ([]domain.Donation, domain.ApiError) {
+	res := make([]domain.Donation, 0)
+	ids, err := clients.GetAllDonationsIds()
+	if err != nil {
+		return nil, err
+	}
+
+	input := make(chan domain.DonationConcurrent)
+	defer close(input)
+	for _, id := range ids {
+		go d.getConcurrentDonation(id, input)
+	}
+
+	for i := 0; i < len(ids); i++ {
+		result := <-input
+		if result.Error != nil {
+			return nil, result.Error
+		}
+		res = append(res, *result.Donation)
+	}
+
+	return res, nil
+}
+
+func (d donationService) getConcurrentDonation(id int64, output chan domain.DonationConcurrent) {
+	vol, err := d.GetDonation(id)
+	output <- domain.DonationConcurrent{Donation: vol, Error: err}
+	return
+
 }

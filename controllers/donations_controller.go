@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/voluntariado-ucc-ing/donations-api/domain"
 	"github.com/voluntariado-ucc-ing/donations-api/services"
-	"net/http"
-	"strconv"
 )
 
-var(
+var (
 	DonationController donationsControllerInterface = &donationController{}
 )
 
@@ -22,12 +23,12 @@ type donationsControllerInterface interface {
 	DeleteDonation(c *gin.Context)
 }
 
-type donationController struct {}
+type donationController struct{}
 
 func (d donationController) GetDonator(c *gin.Context) {
 	mail := c.Query("mail")
 	id := c.Query("id")
-	if mail == "" && id == ""{
+	if mail == "" && id == "" {
 		err := domain.NewBadRequestApiError("must pass mail or id param")
 		c.JSON(err.Status(), err)
 		return
@@ -57,10 +58,8 @@ func (d donationController) GetDonator(c *gin.Context) {
 		}
 	}
 
-
 	c.JSON(http.StatusOK, data)
 }
-
 
 func (d donationController) CreateDonation(c *gin.Context) {
 	var donationRequest domain.DonationRequest
@@ -109,7 +108,13 @@ func (d donationController) GetDonation(c *gin.Context) {
 }
 
 func (d donationController) GetAllDonations(c *gin.Context) {
-	panic("implement me")
+	res, err := services.DonationService.GetAllDonations()
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+	c.JSON(http.StatusOK, res)
+	return
 }
 
 func (d donationController) EditDonation(c *gin.Context) {
