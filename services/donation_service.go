@@ -115,15 +115,18 @@ func (d donationService) GetAllDonations(userFilter int64, statusFilter string, 
 		donationsList = append(donationsList, *result.Donation)
 	}
 
-	for i := range donationsList {
-		if (userFilter != 0 && donationsList[i].DonorId == userFilter) ||
-			(statusFilter != "" && donationsList[i].Status == statusFilter) ||
-			(typeFilter != 0 && donationsList[i].TypeId == typeFilter) {
-			result = append(result, donationsList[i])
+	if userFilter != 0 || typeFilter != 0 || statusFilter != "" {
+		for i := range donationsList {
+			if (userFilter != 0 && donationsList[i].DonorId == userFilter) ||
+				(statusFilter != "" && donationsList[i].Status == statusFilter) ||
+				(typeFilter != 0 && donationsList[i].TypeId == typeFilter) {
+				result = append(result, donationsList[i])
+			}
 		}
+		return result, nil
 	}
 
-	return result, nil
+	return donationsList, nil
 }
 
 func (d donationService) getConcurrentDonation(id int64, output chan domain.DonationConcurrent) {
