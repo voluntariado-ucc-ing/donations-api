@@ -134,7 +134,7 @@ func (d donationController) GetAllDonations(c *gin.Context) {
 	userFilter, parseErr := strconv.Atoi(c.Query("user"))
 	statusFilter := c.Query("status")
 	typeFilter, parseErr := strconv.Atoi(c.Query("type"))
-	if parseErr != nil {
+	if parseErr != nil && (c.Query("user") != "" || c.Query("type") != "") {
 		br := domain.NewBadRequestApiError("query params user or type must be int64")
 		c.JSON(br.Status(), br)
 		return
