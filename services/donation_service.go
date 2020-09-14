@@ -153,6 +153,7 @@ func (d donationService) GetAllDonations(userFilter int64, statusFilter string, 
 				}
 			}
 		}
+		return filteredResult, nil
 	}
 
 	return donationsList, nil
