@@ -16,7 +16,7 @@ type donationServiceInterface interface {
 	GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError)
 	GetDonation(id int64) (*domain.Donation, domain.ApiError)
 	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
-	GetAllDonations() ([]domain.Donation, domain.ApiError)
+	GetAllDonations(userFilter int64, statusFilter string, typeFilter int64) ([]domain.Donation, domain.ApiError)
 }
 
 type donationService struct{}
@@ -77,8 +77,9 @@ func (d donationService) GetDonatorById(id int64) (*domain.Donor, domain.ApiErro
 	return donor, nil
 }
 
-func (d donationService) GetAllDonations() ([]domain.Donation, domain.ApiError) {
-	res := make([]domain.Donation, 0)
+func (d donationService) GetAllDonations(userFilter int64, statusFilter string, typeFilter int64) ([]domain.Donation, domain.ApiError) {
+	donationsList := make([]domain.Donation, 0)
+	result := make([]domain.Donation, 0)
 	ids, err := clients.GetAllDonationsIds()
 	if err != nil {
 		return nil, err
@@ -95,10 +96,18 @@ func (d donationService) GetAllDonations() ([]domain.Donation, domain.ApiError) 
 		if result.Error != nil {
 			return nil, result.Error
 		}
-		res = append(res, *result.Donation)
+		donationsList = append(donationsList, *result.Donation)
 	}
 
-	return res, nil
+	for i := range donationsList {
+		if (userFilter != 0 && donationsList[i].DonorId == userFilter) ||
+			(statusFilter != "" && donationsList[i].Status == statusFilter) ||
+			(typeFilter != 0 && donationsList[i].TypeId == typeFilter) {
+			result = append(result, donationsList[i])
+		}
+	}
+
+	return result, nil
 }
 
 func (d donationService) getConcurrentDonation(id int64, output chan domain.DonationConcurrent) {
