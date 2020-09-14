@@ -95,7 +95,6 @@ func (d donationService) GetDonatorById(id int64) (*domain.Donor, domain.ApiErro
 
 func (d donationService) GetAllDonations(userFilter int64, statusFilter string, typeFilter int64) ([]domain.Donation, domain.ApiError) {
 	donationsList := make([]domain.Donation, 0)
-	result := make([]domain.Donation, 0)
 	ids, err := clients.GetAllDonationsIds()
 	if err != nil {
 		return nil, err
@@ -116,6 +115,7 @@ func (d donationService) GetAllDonations(userFilter int64, statusFilter string, 
 	}
 
 	if userFilter != 0 || typeFilter != 0 || statusFilter != "" {
+		result := make([]domain.Donation, 0)
 		for i := range donationsList {
 			if (userFilter != 0 && donationsList[i].DonorId == userFilter) ||
 				(statusFilter != "" && donationsList[i].Status == statusFilter) ||
