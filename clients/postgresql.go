@@ -13,13 +13,13 @@ import (
 )
 
 const (
-	queryGetAllDonations = "SELECT donation_id FROM donations"
-	queryInsertDirection = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
-	queryInsertDonation  = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
-	queryGetDonorByMail  = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
-	queryInsertDonor     = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
-	queryGetDonationById = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
-	queryGetDonorById    = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
+	queryGetAllDonations  = "SELECT donation_id FROM donations"
+	queryInsertDirection  = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
+	queryInsertDonation   = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
+	queryGetDonorByMail   = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
+	queryInsertDonor      = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
+	queryGetDonationById  = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
+	queryGetDonorById     = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
 	queryUpdateStatusById = "UPDATE donations SET status=$1 WHERE donation_id=$2"
 )
 
