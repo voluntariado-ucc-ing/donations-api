@@ -20,6 +20,7 @@ const (
 	queryInsertDonor     = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
 	queryGetDonationById = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
 	queryGetDonorById    = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
+	queryUpdateStatusById = "UPDATE donations SET status=$1 WHERE donation_id=$2"
 )
 
 var dbClient *sql.DB
@@ -65,7 +66,7 @@ func InsertDonation(don domain.Donation) (int64, domain.ApiError) {
 	}
 	time := time.Now()
 	date := fmt.Sprintf("%d-%d-%d", time.Year(), time.Month(), time.Day())
-	res := q.QueryRow(don.Quantity, don.Unit, don.Description, don.TypeId, don.DonorId, don.DirectionId, date, "active", don.Element)
+	res := q.QueryRow(don.Quantity, don.Unit, don.Description, don.TypeId, don.DonorId, don.DirectionId, date, domain.StatusToBeConfirmed, don.Element)
 	err = res.Scan(&id)
 	if err != nil {
 		return 0, domain.NewInternalServerApiError("Error scaning last insert id for create donation", err)
@@ -161,4 +162,18 @@ func GetAllDonationsIds() ([]int64, domain.ApiError) {
 	}
 
 	return ids, nil
+}
+
+func UpdateDonationStatus(donationId int64, status string) domain.ApiError {
+	q, err := dbClient.Prepare(queryUpdateStatusById)
+	if err != nil {
+		fmt.Println(err)
+		return domain.NewInternalServerApiError("error preparing query", err)
+	}
+	_, err = q.Exec(status, donationId)
+	if err != nil {
+		fmt.Println(err)
+		return domain.NewInternalServerApiError("error updating status from db", err)
+	}
+	return nil
 }

@@ -1,11 +1,11 @@
 package domain
 
-/* STATUS
-toBeConfirmed
-toBeRetrieved
-retrieved
-rejected
-*/
+const (
+	StatusToBeConfirmed = "to_be_confirmed"
+	StatusToBeRetrieved = "to_be_retrieved"
+	StatusRetrieved     = "retrieved"
+	StatusRejected      = "rejected"
+)
 
 type Donation struct {
 	DonationId  int64      `json:"donation_id"`
@@ -38,4 +38,15 @@ type Direction struct {
 	Details     string `json:"details"`
 	City        string `json:"city"`
 	PostalCode  int64  `json:"postal_code"`
+}
+
+type StatusRequest struct {
+	Status string `json:"status"`
+}
+
+func (s *StatusRequest) IsValidStatus() bool {
+	return s.Status == StatusRejected ||
+		s.Status == StatusRetrieved ||
+		s.Status == StatusToBeConfirmed ||
+		s.Status == StatusToBeRetrieved
 }

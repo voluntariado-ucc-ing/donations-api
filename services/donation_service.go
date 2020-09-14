@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/voluntariado-ucc-ing/donations-api/clients"
@@ -17,9 +18,24 @@ type donationServiceInterface interface {
 	GetDonation(id int64) (*domain.Donation, domain.ApiError)
 	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
 	GetAllDonations(userFilter int64, statusFilter string, typeFilter int64) ([]domain.Donation, domain.ApiError)
+	UpdateStatus(donationId int64, request domain.StatusRequest) (domain.Donation, domain.ApiError)
 }
 
 type donationService struct{}
+
+func (d donationService) UpdateStatus(donationId int64, request domain.StatusRequest) (*domain.Donation, domain.ApiError) {
+	if !request.IsValidStatus() {
+		return nil, domain.NewBadRequestApiError("Invalid status for donation")
+	}
+
+	err := clients.UpdateDonationStatus(donationId, request.Status)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return clients.GetDonation(donationId)
+}
 
 func (d donationService) GetDonation(id int64) (*domain.Donation, domain.ApiError) {
 	return clients.GetDonation(id)

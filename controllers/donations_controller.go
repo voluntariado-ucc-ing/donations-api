@@ -21,9 +21,32 @@ type donationsControllerInterface interface {
 	GetAllDonations(c *gin.Context)
 	EditDonation(c *gin.Context)
 	DeleteDonation(c *gin.Context)
+	UpdateDonationStatus(c *gin.Context)
 }
 
 type donationController struct{}
+
+func (d donationController) UpdateDonationStatus(c *gin.Context) {
+	donationId, parseErr := strconv.Atoi(c.Param("id"))
+	if parseErr != nil {
+		err := domain.NewBadRequestApiError("invalid donation id")
+		c.JSON(err.Status(), err)
+		return
+	}
+	var newStatus domain.StatusRequest
+	if err := c.ShouldBindJSON(&newStatus); err != nil {
+		err := domain.NewBadRequestApiError("invalid json body")
+		c.JSON(err.Status(), err)
+		return
+	}
+	res, err := services.DonationService.UpdateStatus(int64(donationId), newStatus)
+	if err != nil {
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
 
 func (d donationController) GetDonator(c *gin.Context) {
 	mail := c.Query("mail")
