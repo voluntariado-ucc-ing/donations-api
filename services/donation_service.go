@@ -18,7 +18,7 @@ type donationServiceInterface interface {
 	GetDonation(id int64) (*domain.Donation, domain.ApiError)
 	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
 	GetAllDonations(userFilter int64, statusFilter string, typeFilter int64) ([]domain.Donation, domain.ApiError)
-	UpdateStatus(donationId int64, request domain.StatusRequest) (domain.Donation, domain.ApiError)
+	UpdateStatus(donationId int64, request domain.StatusRequest) (*domain.Donation, domain.ApiError)
 }
 
 type donationService struct{}
