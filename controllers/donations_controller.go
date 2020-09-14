@@ -131,17 +131,33 @@ func (d donationController) GetDonation(c *gin.Context) {
 }
 
 func (d donationController) GetAllDonations(c *gin.Context) {
-	userFilter, parseErr := strconv.Atoi(c.Query("user"))
+	userFilter := c.Query("user")
 	statusFilter := c.Query("status")
-	typeFilter, parseErr := strconv.Atoi(c.Query("type"))
-	if parseErr != nil && (c.Query("user") != "" || c.Query("type") != "") {
-		br := domain.NewBadRequestApiError("query params user or type must be int64")
-		c.JSON(br.Status(), br)
-		return
+	typeFilter := c.Query("type")
+
+	var userInt int64 = 0
+	var typeInt int64 = 0
+	var err error
+	if userFilter != "" {
+		userInt, err = strconv.ParseInt(userFilter, 10, 64)
+		if err != nil {
+			err := domain.NewBadRequestApiError("user must be int")
+			c.JSON(err.Status(), err)
+			return
+		}
 	}
-	res, err := services.DonationService.GetAllDonations(int64(userFilter), statusFilter, int64(typeFilter))
-	if err != nil {
-		c.JSON(err.Status(), err)
+	if typeFilter != "" {
+		typeInt, err = strconv.ParseInt(typeFilter, 10, 64)
+		if err != nil {
+			err := domain.NewBadRequestApiError("type must be int")
+			c.JSON(err.Status(), err)
+			return
+		}
+	}
+
+	res, resErr := services.DonationService.GetAllDonations(userInt, statusFilter, typeInt)
+	if resErr != nil {
+		c.JSON(resErr.Status(), resErr)
 		return
 	}
 	c.JSON(http.StatusOK, res)

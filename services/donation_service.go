@@ -114,16 +114,45 @@ func (d donationService) GetAllDonations(userFilter int64, statusFilter string, 
 		donationsList = append(donationsList, *result.Donation)
 	}
 
-	if userFilter != 0 || typeFilter != 0 || statusFilter != "" {
-		result := make([]domain.Donation, 0)
+	filteredResult := make([]domain.Donation, 0)
+	if statusFilter != "" || typeFilter != 0 || userFilter != 0 {
 		for i := range donationsList {
-			if (userFilter != 0 && donationsList[i].DonorId == userFilter) ||
-				(statusFilter != "" && donationsList[i].Status == statusFilter) ||
-				(typeFilter != 0 && donationsList[i].TypeId == typeFilter) {
-				result = append(result, donationsList[i])
+			if statusFilter != "" {
+				if typeFilter != 0 {
+					if userFilter != 0 {
+						if donationsList[i].Status == statusFilter &&
+							donationsList[i].TypeId == typeFilter &&
+							donationsList[i].DonorId == userFilter {
+							filteredResult = append(filteredResult, donationsList[i])
+						}
+					} else {
+						if donationsList[i].Status == statusFilter &&
+							donationsList[i].TypeId == typeFilter {
+							filteredResult = append(filteredResult, donationsList[i])
+						}
+					}
+				} else {
+					if donationsList[i].Status == statusFilter {
+						filteredResult = append(filteredResult, donationsList[i])
+					}
+				}
+			} else if typeFilter != 0 {
+				if userFilter != 0 {
+					if donationsList[i].TypeId == typeFilter &&
+						donationsList[i].DonorId == userFilter {
+						filteredResult = append(filteredResult, donationsList[i])
+					}
+				} else {
+					if donationsList[i].TypeId == typeFilter {
+						filteredResult = append(filteredResult, donationsList[i])
+					}
+				}
+			} else if userFilter != 0 {
+				if donationsList[i].DonorId == userFilter {
+					filteredResult = append(filteredResult, donationsList[i])
+				}
 			}
 		}
-		return result, nil
 	}
 
 	return donationsList, nil
