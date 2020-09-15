@@ -46,10 +46,12 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 	donor, err := clients.GetDonatorByMail(request.Donor.Mail)
 	if err != nil {
 		if err.Status() != http.StatusNotFound {
+			fmt.Println(err)
 			return nil, err
 		}
 		donorId, err = clients.InsertDonor(request.Donor)
 		if err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 	} else {
@@ -59,6 +61,7 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 	for index := range request.Donations {
 		directionId, err := clients.InsertDirection(*request.Donations[index].Direction)
 		if err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 
@@ -67,6 +70,7 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 
 		donationId, err := clients.InsertDonation(request.Donations[index])
 		if err != nil {
+			fmt.Println(err)
 			return nil, err
 		}
 
@@ -80,6 +84,7 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 func (d donationService) GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError) {
 	donor, err := clients.GetDonatorByMail(mail)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return donor, nil
@@ -88,6 +93,7 @@ func (d donationService) GetDonatorByMail(mail string) (*domain.Donor, domain.Ap
 func (d donationService) GetDonatorById(id int64) (*domain.Donor, domain.ApiError) {
 	donor, err := clients.GetDonatorById(id)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	return donor, nil
@@ -97,6 +103,7 @@ func (d donationService) GetAllDonations(userFilter int64, statusFilter string, 
 	donationsList := make([]domain.Donation, 0)
 	ids, err := clients.GetAllDonationsIds()
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -109,6 +116,7 @@ func (d donationService) GetAllDonations(userFilter int64, statusFilter string, 
 	for i := 0; i < len(ids); i++ {
 		result := <-input
 		if result.Error != nil {
+			fmt.Println(result.Error	)
 			return nil, result.Error
 		}
 		donationsList = append(donationsList, *result.Donation)
@@ -163,5 +171,4 @@ func (d donationService) getConcurrentDonation(id int64, output chan domain.Dona
 	vol, err := d.GetDonation(id)
 	output <- domain.DonationConcurrent{Donation: vol, Error: err}
 	return
-
 }
