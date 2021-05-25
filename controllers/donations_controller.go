@@ -103,6 +103,25 @@ func (d donationController) CreateDonation(c *gin.Context) {
 	c.JSON(http.StatusCreated, r)
 }
 
+func (d donationController) CreateDonator(c *gin.Context) {
+	var donatorRequest domain.DonatorRequest
+	if err := c.ShouldBindJSON(&donatorRequest); err != nil {
+		fmt.Println(err)
+		err := domain.NewBadRequestApiError("Invalid donator body")
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	r, err := services.DonationService.CreateDonator(donatorRequest)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, r)
+}
+
 func (d donationController) GetDonation(c *gin.Context) {
 	donationId := c.Param("id")
 	if donationId == "" {
