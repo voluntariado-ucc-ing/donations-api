@@ -26,6 +26,10 @@ type DonationRequest struct {
 	Donor     Donor      `json:"donator"`
 }
 
+type DonatorRequest struct {¿
+	Donor     Donor      `json:"donator"`
+}
+
 type DonationConcurrent struct {
 	Donation *Donation
 	Error    ApiError
