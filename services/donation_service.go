@@ -81,25 +81,6 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 	return &request, nil
 }
 
-func (d donationService) CreateDonator(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError) {
-	var donorId int64 = 0
-	donor, err := clients.GetDonatorByMail(request.Donor.Mail)
-	if err != nil {
-		if err.Status() != http.StatusNotFound {
-			fmt.Println(err)
-			return nil, err
-		}
-		donorId, err = clients.InsertDonor(request.Donor)
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-	} else {
-		donorId = donor.DonorId
-	}
-
-	return &request, nil
-}
 
 func (d donationService) GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError) {
 	donor, err := clients.GetDonatorByMail(mail)
