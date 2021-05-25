@@ -82,6 +82,7 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 	return &request, nil
 }
 
+
 func (d donationService) CreateDonator(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError) {
 
 	_, err := clients.GetDonatorByMail(request.Donor.Mail)
@@ -99,6 +100,7 @@ func (d donationService) CreateDonator(request domain.DonatorRequest) (*domain.D
 
 	return &request, nil
 }
+
 
 func (d donationService) GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError) {
 	donor, err := clients.GetDonatorByMail(mail)
