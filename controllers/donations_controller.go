@@ -16,6 +16,7 @@ var (
 
 type donationsControllerInterface interface {
 	CreateDonation(c *gin.Context)
+	CreateDonator(c *gin.Context)
 	GetDonation(c *gin.Context)
 	GetDonator(c *gin.Context)
 	GetAllDonations(c *gin.Context)
@@ -94,6 +95,25 @@ func (d donationController) CreateDonation(c *gin.Context) {
 	}
 
 	r, err := services.DonationService.CreateDonation(donationRequest)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, r)
+}
+
+func (d donationController) CreateDonator(c *gin.Context) {
+	var donatorRequest domain.DonatorRequest
+	if err := c.ShouldBindJSON(&donatorRequest); err != nil {
+		fmt.Println(err)
+		err := domain.NewBadRequestApiError("Invalid donator body")
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	r, err := services.DonationService.CreateDonator(donatorRequest)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(err.Status(), err)

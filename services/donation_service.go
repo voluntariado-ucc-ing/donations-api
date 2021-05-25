@@ -14,6 +14,7 @@ var (
 
 type donationServiceInterface interface {
 	CreateDonation(request domain.DonationRequest) (*domain.DonationRequest, domain.ApiError)
+	CreateDonator(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError)
 	GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError)
 	GetDonation(id int64) (*domain.Donation, domain.ApiError)
 	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
@@ -76,6 +77,25 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 
 		request.Donations[index].DonationId = donationId
 		request.Donations[index].Direction = nil
+	}
+
+	return &request, nil
+}
+
+
+func (d donationService) CreateDonator(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError) {
+
+	_, err := clients.GetDonatorByMail(request.Donor.Mail)
+	if err != nil {
+		if err.Status() != http.StatusNotFound {
+			fmt.Println(err)
+			return nil, err
+		}
+		_, err = clients.InsertDonor(request.Donor)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
 	}
 
 	return &request, nil
