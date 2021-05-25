@@ -10,6 +10,7 @@ func mapUrls() {
 	router.GET("/donations/all", controllers.DonationController.GetAllDonations)
 
 	router.POST("/donations/create", controllers.DonationController.CreateDonation)
+	router.POST("/donations/createdonor", controllers.DonationController.CreateDonator)
 
 	router.PATCH("/donations/:id", controllers.DonationController.UpdateDonationStatus)
 }
