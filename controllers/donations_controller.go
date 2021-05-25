@@ -16,6 +16,7 @@ var (
 
 type donationsControllerInterface interface {
 	CreateDonation(c *gin.Context)
+	CreateDonator(c *gin.Context)
 	GetDonation(c *gin.Context)
 	GetDonator(c *gin.Context)
 	GetAllDonations(c *gin.Context)

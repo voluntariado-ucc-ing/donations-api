@@ -26,7 +26,7 @@ type DonationRequest struct {
 	Donor     Donor      `json:"donator"`
 }
 
-type DonatorRequest struct {¿
+type DonatorRequest struct {
 	Donor     Donor      `json:"donator"`
 }
 
