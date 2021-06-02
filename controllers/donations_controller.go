@@ -23,6 +23,7 @@ type donationsControllerInterface interface {
 	EditDonation(c *gin.Context)
 	DeleteDonation(c *gin.Context)
 	UpdateDonationStatus(c *gin.Context)
+	EditDonator(c *gin.Context)
 }
 
 type donationController struct{}
@@ -191,4 +192,23 @@ func (d donationController) EditDonation(c *gin.Context) {
 
 func (d donationController) DeleteDonation(c *gin.Context) {
 	panic("implement me")
+}
+
+func (d donationController) EditDonator(c *gin.Context) {
+	var donatorRequest domain.DonatorRequest
+	if err := c.ShouldBindJSON(&donatorRequest); err != nil {
+		fmt.Println(err)
+		err := domain.NewBadRequestApiError("Invalid donator body")
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	r, err := services.DonationService.EditDonor(donatorRequest)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(err.Status(), err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, r)
 }

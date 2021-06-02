@@ -13,16 +13,17 @@ import (
 )
 
 const (
-	queryGetAllDonations  = "SELECT donation_id FROM donations"
-	queryInsertDirection  = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
-	queryInsertDonation   = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
-	queryGetDonorByMail   = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
-	queryInsertDonor      = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
-	queryGetDonationById  = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
-	queryGetDonorById     = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
-	queryUpdateStatusById = "UPDATE donations SET status=$1 WHERE donation_id=$2"
-	queryUpdateDonationById   = "UPDATE donations SET quantity=$1, unit=$2, description=$3, type_id=$4, donator_id=$5, direction_id=$6, donation_date=$7, status=$8, element=%9 WHERE donation_id=$10"
-	queryDeleteDonationById ="DELETE FROM donations WHERE donation_id=$1"
+	queryGetAllDonations    = "SELECT donation_id FROM donations"
+	queryInsertDirection    = "INSERT INTO directions (street, number, details, city, postal_code) VALUES ($1,$2,$3,$4,$5) RETURNING direction_id"
+	queryInsertDonation     = "INSERT INTO donations (quantity, unit, description, type_id, donator_id, direction_id, donation_date, status, element) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING donation_id"
+	queryGetDonorByMail     = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE mail=$1"
+	queryInsertDonor        = "INSERT INTO donators (mail, first_name, last_name, phone_number) VALUES ($1, $2, $3, $4) RETURNING donator_id"
+	queryGetDonationById    = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
+	queryGetDonorById       = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
+	queryUpdateStatusById   = "UPDATE donations SET status=$1 WHERE donation_id=$2"
+	queryUpdateDonationById = "UPDATE donations SET quantity=$1, unit=$2, description=$3, type_id=$4, donator_id=$5, direction_id=$6, donation_date=$7, status=$8, element=$9 WHERE donation_id=$10"
+	queryDeleteDonationById = "DELETE FROM donations WHERE donation_id=$1"
+	queryEditDonorById = "UPDATE donators SET mail=$1, first_name=$2, last_name=$3, phone_number=$4 WHERE donator_id=$5"
 )
 
 var dbClient *sql.DB
@@ -180,15 +181,15 @@ func UpdateDonationStatus(donationId int64, status string) domain.ApiError {
 	return nil
 }
 
-func UpdateDonation(donationId int64, donationUpdate domain.Donation) (int64,domain.ApiError){
+func UpdateDonation(donationUpdate domain.Donation) (int64, domain.ApiError) {
 	panic("finish me")
 
 	q, err := dbClient.Prepare(queryUpdateDonationById)
 	if err != nil {
 		fmt.Println(err)
-		return 0,domain.NewInternalServerApiError("error preparing query", err)
+		return 0, domain.NewInternalServerApiError("error preparing query", err)
 	}
-	id:=donationUpdate.DonationId
+	id := donationUpdate.DonationId
 	time := time.Now()
 	date := fmt.Sprintf("%d-%d-%d", time.Year(), time.Month(), time.Day())
 	res := q.QueryRow(donationUpdate.Quantity, donationUpdate.Unit, donationUpdate.Description, donationUpdate.TypeId, donationUpdate.DonorId, donationUpdate.DirectionId, date, domain.StatusToBeConfirmed, donationUpdate.Element)
@@ -197,12 +198,24 @@ func UpdateDonation(donationId int64, donationUpdate domain.Donation) (int64,dom
 		return 0, domain.NewInternalServerApiError("Error scaning last insert id for create donation", err)
 	}
 	return id, nil
-
-
-
 }
 
-func DeleteDonation(donationId int64) domain.ApiError{
+func DeleteDonation(donationId int64) domain.ApiError {
 	panic("implement me")
 	return nil
+}
+
+func EditDonorById(donorUpdate domain.Donor) (int64, domain.ApiError) {
+	q, err := dbClient.Prepare(queryUpdateDonationById)
+	if err != nil {
+		fmt.Println(err)
+		return 0, domain.NewInternalServerApiError("error preparing query", err)
+	}
+	id := donorUpdate.DonorId
+	res := q.QueryRow(donorUpdate.Mail,donorUpdate.FirstName,donorUpdate.LastName,donorUpdate.PhoneNumber,donorUpdate.DonorId)
+	err = res.Scan(&id)
+	if err != nil {
+		return 0, domain.NewInternalServerApiError("Error scaning last insert id for create donation", err)
+	}
+	return id, nil
 }

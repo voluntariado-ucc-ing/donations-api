@@ -11,6 +11,7 @@ func mapUrls() {
 
 	router.POST("/donations/create", controllers.DonationController.CreateDonation)
 	router.POST("/donations/createdonor", controllers.DonationController.CreateDonator)
+	router.POST("/donations/editdonor", controllers.DonationController.EditDonator)
 
 	router.PATCH("/donations/:id", controllers.DonationController.UpdateDonationStatus)
 }

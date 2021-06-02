@@ -20,6 +20,7 @@ type donationServiceInterface interface {
 	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
 	GetAllDonations(userFilter int64, statusFilter string, typeFilter int64) ([]domain.Donation, domain.ApiError)
 	UpdateStatus(donationId int64, request domain.StatusRequest) (*domain.Donation, domain.ApiError)
+	EditDonor(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError)
 }
 
 type donationService struct{}
@@ -82,7 +83,6 @@ func (d donationService) CreateDonation(request domain.DonationRequest) (*domain
 	return &request, nil
 }
 
-
 func (d donationService) CreateDonator(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError) {
 
 	_, err := clients.GetDonatorByMail(request.Donor.Mail)
@@ -100,7 +100,6 @@ func (d donationService) CreateDonator(request domain.DonatorRequest) (*domain.D
 
 	return &request, nil
 }
-
 
 func (d donationService) GetDonatorByMail(mail string) (*domain.Donor, domain.ApiError) {
 	donor, err := clients.GetDonatorByMail(mail)
@@ -137,7 +136,7 @@ func (d donationService) GetAllDonations(userFilter int64, statusFilter string, 
 	for i := 0; i < len(ids); i++ {
 		result := <-input
 		if result.Error != nil {
-			fmt.Println(result.Error	)
+			fmt.Println(result.Error)
 			return nil, result.Error
 		}
 		donationsList = append(donationsList, *result.Donation)
@@ -192,4 +191,21 @@ func (d donationService) getConcurrentDonation(id int64, output chan domain.Dona
 	vol, err := d.GetDonation(id)
 	output <- domain.DonationConcurrent{Donation: vol, Error: err}
 	return
+}
+
+func (d donationService) EditDonor(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError) {
+	donator, err := clients.GetDonatorById(request.Donor.DonorId)
+	if err != nil {
+		if err.Status() != http.StatusNotFound {
+			fmt.Println(err)
+			return nil, err
+		}
+		_, err = clients.EditDonorById(*donator)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+	}
+
+	return &request, nil
 }
