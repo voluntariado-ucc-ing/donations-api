@@ -196,26 +196,6 @@ func (d donationController) DeleteDonation(c *gin.Context) {
 
 func (d donationController) EditDonator(c *gin.Context) {
 	var donatorRequest domain.DonatorRequest
-	id := c.Query("id")
-	if  id == "" {
-		err := domain.NewBadRequestApiError("must pass mail or id param")
-		c.JSON(err.Status(), err)
-		return
-	}
-
-	donorId, parseErr := strconv.ParseInt(id, 10, 64)
-	if parseErr != nil {
-		fmt.Println(parseErr)
-		badRequest := domain.NewBadRequestApiError("donator id must be a number " + parseErr.Error())
-		c.JSON(badRequest.Status(), badRequest)
-		return
-	}
-
-	//data, err = services.DonationService.GetDonatorById(donorId)
-	//if err != nil {
-	//	c.JSON(err.Status(), err)
-	//	return
-	//}
 
 	if err := c.ShouldBindJSON(&donatorRequest); err != nil {
 		fmt.Println(err)
@@ -224,7 +204,7 @@ func (d donationController) EditDonator(c *gin.Context) {
 		return
 	}
 
-	r, err := services.DonationService.EditDonor(donorId,donatorRequest)
+	r, err := services.DonationService.EditDonor(donatorRequest)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(err.Status(), err)

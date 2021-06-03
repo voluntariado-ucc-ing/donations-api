@@ -20,7 +20,7 @@ type donationServiceInterface interface {
 	GetDonatorById(id int64) (*domain.Donor, domain.ApiError)
 	GetAllDonations(userFilter int64, statusFilter string, typeFilter int64) ([]domain.Donation, domain.ApiError)
 	UpdateStatus(donationId int64, request domain.StatusRequest) (*domain.Donation, domain.ApiError)
-	EditDonor(id int64, request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError)
+	EditDonor(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError)
 }
 
 type donationService struct{}
@@ -193,15 +193,15 @@ func (d donationService) getConcurrentDonation(id int64, output chan domain.Dona
 	return
 }
 
-func (d donationService) EditDonor(id int64, request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError) {
+func (d donationService) EditDonor(request domain.DonatorRequest) (*domain.DonatorRequest, domain.ApiError) {
 
-	_, err := clients.GetDonatorById(id)
+	_, err := clients.GetDonatorByMail(request.Donor.Mail)
 	if err != nil {
 		if err.Status() != http.StatusNotFound {
 			fmt.Println(err)
 			return nil, err
 		}
-		_, err = clients.EditDonorById(request.Donor)
+		_, err = clients.EditDonorByMail(request.Donor)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
