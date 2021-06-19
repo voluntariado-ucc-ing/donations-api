@@ -186,10 +186,7 @@ func EditDonorByMail(donorUpdate domain.Donor) (int64, domain.ApiError) {
 		return 0, domain.NewInternalServerApiError("error preparing query", err)
 	}
 	id := donorUpdate.DonorId
-	res := q.QueryRow(donorUpdate.FirstName,donorUpdate.LastName,donorUpdate.PhoneNumber,donorUpdate.Mail)
-	err = res.Scan(&id)
-	if err != nil {
-		return 0, domain.NewInternalServerApiError("Error scaning last insert id for create donation", err)
-	}
+	q.QueryRow(donorUpdate.FirstName,donorUpdate.LastName,donorUpdate.PhoneNumber,donorUpdate.Mail)
+
 	return id, nil
 }
