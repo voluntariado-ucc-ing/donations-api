@@ -201,12 +201,13 @@ func (d donationService) EditDonor(request domain.DonatorRequest) (*domain.Donat
 			fmt.Println(err)
 			return nil, err
 		}
-		_, err = clients.EditDonorByMail(request.Donor)
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
 	}
+	_, err = clients.EditDonorByMail(request.Donor)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
 
 	return &request, nil
 }
