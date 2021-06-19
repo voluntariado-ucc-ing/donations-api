@@ -21,7 +21,7 @@ const (
 	queryGetDonationById    = "SELECT d.donation_id, d.quantity, d.unit, d.description, d.type_id, d.donation_date, d.status, d.element, d.donator_id, i.direction_id, i.street, i.number, i.details, i.city, i.postal_code FROM directions i INNER JOIN donations d ON i.direction_id=d.direction_id WHERE d.donation_id=$1"
 	queryGetDonorById       = "SELECT donator_id, mail, first_name, last_name, phone_number FROM donators WHERE donator_id=$1"
 	queryUpdateStatusById   = "UPDATE donations SET status=$1 WHERE donation_id=$2"
-	queryEditDonorByMail = "UPDATE donators SET first_name=$2, last_name=$3, phone_number=$4 WHERE mail=$5"
+	queryEditDonorByMail = "UPDATE donators SET first_name=$1, last_name=$2, phone_number=$3 WHERE mail=$4"
 )
 
 var dbClient *sql.DB

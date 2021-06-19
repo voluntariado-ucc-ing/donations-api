@@ -20,8 +20,6 @@ type donationsControllerInterface interface {
 	GetDonation(c *gin.Context)
 	GetDonator(c *gin.Context)
 	GetAllDonations(c *gin.Context)
-	EditDonation(c *gin.Context)
-	DeleteDonation(c *gin.Context)
 	UpdateDonationStatus(c *gin.Context)
 	EditDonator(c *gin.Context)
 }
@@ -183,15 +181,6 @@ func (d donationController) GetAllDonations(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, res)
 	return
-}
-
-func (d donationController) EditDonation(c *gin.Context) {
-
-	panic("implement me")
-}
-
-func (d donationController) DeleteDonation(c *gin.Context) {
-	panic("implement me")
 }
 
 func (d donationController) EditDonator(c *gin.Context) {
